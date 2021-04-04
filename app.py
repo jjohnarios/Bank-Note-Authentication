@@ -8,11 +8,17 @@ from flask import Flask, request
 import pandas as pd
 import numpy as np
 from keras.models import load_model
-import tensorflow as tf
-tf.get_logger().setLevel('INFO')
+import tensorflow.compat.v1 as tf
+tf.disable_v2_behavior()
 from tensorflow.python.keras.backend import set_session
+import flasgger
+from flasgger import Swagger
+
+# Ignore Tensorflow warnings
+tf.get_logger().setLevel('INFO')
 
 app=Flask(__name__)
+Swagger(app) # Generate UI using flasgger
 
 # Needed for keras
 sess = tf.Session()
@@ -29,10 +35,36 @@ model=load_model("model.h5")
 # route page
 @app.route('/')
 def welcome():
-    return "Welcome ALL"
+    return "Welcome All"
 
 @app.route('/predict')
 def predict_bank_note_authentication():
+    
+    """Bank Note Authentication.
+    This is using docstrings for specifications.
+    ---
+    parameters:
+      - name: variance
+        in: query
+        type: number
+        required: true
+      - name: skewness
+        in: query
+        type: number
+        required: true
+      - name: curtosis
+        in: query
+        type: number
+        required: true
+      - name: entropy
+        in: query
+        type: number
+        required: true
+    responses:
+        200:
+            description: The output values
+            
+    """
     global graph
     global sess
     # Get all feature variables
@@ -46,14 +78,34 @@ def predict_bank_note_authentication():
     
     with graph.as_default():
         set_session(sess)
-        prediction=model.predict(note)    
+        prediction=model.predict(note)
+        prediction=round(float(prediction)) # Round to closest integer 0 or 1
     
-    # Ισως θελει να περαστεί από συνάρτηση για να δίνει ακριβώς 0 ή 1.
+    # Prediction value into either 'Fake' or 'Authentic'
+    result=""
+    if prediction==0:
+        result="Fake"
+    elif prediction==1:
+        result="Authentic"
     
-    return "Prediction: {}".format(prediction)
+    return "Bank Note is: {}".format(result)
 
+# Post to send formData to server
 @app.route('/predict_file',methods=["POST"])
 def predict_bank_note_file():
+    '''Bank Note Authentication.
+    This is using docstrings for specifications.
+    ---
+    parameters:
+      - name: file
+        in: formData
+        type: file
+        required: true
+        
+    responses:
+        200:
+            description: The output values
+    '''
     global graph
     global sess
 
@@ -61,11 +113,19 @@ def predict_bank_note_file():
     
     with graph.as_default():
         set_session(sess)
-        prediction=model.predict(df_test)    
+        prediction=model.predict(df_test)
     
-    # Ισως θελει να περαστεί από συνάρτηση για να δίνει ακριβώς 0 ή 1.
+    results=[]
+    # Every prediction value into either 'Fake' or 'Authentic'
+    for p in list(prediction):
+        pred=round(float(p))
+        if pred==0:
+            results.append("Fake")
+        elif pred==1:
+            results.append("Authentic")
     
-    return "Predicted values for csv are: {}".format(list(prediction))
+    
+    return "Bank Notes are: {}".format(results)
 
 
 if __name__=='__main__':
