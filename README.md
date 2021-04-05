@@ -14,4 +14,5 @@ To run the application:
 ```
 streamlit run Streamlit_app.py
 ```
+<img src="Demo/demp.gif" width="500" />
 
