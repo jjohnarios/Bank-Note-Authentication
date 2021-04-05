@@ -2,6 +2,7 @@
 
 Detection of fraudulent bank notes based on image-exctracted features. :dollar: :pound: :euro:
 
+![Python](https://img.shields.io/badge/-Python-yellow) ![Jupyter Notebook](https://img.shields.io/badge/-JupyterNotebook-cyan) ![StreamLit](https://img.shields.io/badge/-Streamlit-red) ![Flask](https://img.shields.io/badge/-Flask-black) ![Flasgger](https://img.shields.io/badge/-Flasgger-purple) ![Docker](https://img.shields.io/badge/-Docker-blue) 
 
 ## Dataset
 **Data from Kaggle**: https://www.kaggle.com/ritesaluja/bank-note-authentication-uci-data
